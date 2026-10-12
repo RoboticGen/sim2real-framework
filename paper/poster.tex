@@ -1,0 +1,199 @@
+% A0 portrait showcase poster. Compile from the repository root or paper/.
+\documentclass{article}
+\usepackage[paperwidth=841mm,paperheight=1189mm,margin=0mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{helvet,courier,anyfontsize,graphicx,tikz}
+\usepackage[hidelinks]{hyperref}
+\usetikzlibrary{arrows.meta,calc}
+\renewcommand{\familydefault}{\sfdefault}
+\pagestyle{empty}
+\hyphenpenalty=10000\exhyphenpenalty=10000
+\hypersetup{pdftitle={simtoreal: Automated Sim-to-Real Deployment for Reinforcement Learning},pdfauthor={Nidharshan V. and collaborators}}
+\definecolor{navy}{HTML}{042034}
+\definecolor{teal}{HTML}{007F87}
+\definecolor{pale}{HTML}{EAF4F5}
+\definecolor{muted}{HTML}{526574}
+\definecolor{line}{HTML}{CFDCE2}
+\definecolor{gold}{HTML}{D9A74A}
+\IfFileExists{paper/poster.tex}{\def\paperdir{paper/}\def\repodir{}}{\def\paperdir{}\def\repodir{../}}
+\newcommand{\sz}[1]{\fontsize{#1}{\dimexpr #1pt*6/5\relax}\selectfont}
+\newcommand{\sectionlabel}[3]{\node[anchor=west,text=teal,font=\sz{34}\bfseries] at (42,#1) {#2};\node[anchor=west,text=navy,font=\sz{38}\bfseries] at (68,#1) {#3};}
+\begin{document}
+\null
+\begin{tikzpicture}[remember picture,overlay]
+\begin{scope}[shift={(current page.north west)},x=1mm,y=-1mm,
+ every node/.style={inner sep=0,text=navy},
+ box/.style={draw=line,fill=pale,rounded corners=3mm,line width=1pt,align=center,inner sep=4mm,font=\sz{28}},
+ flow/.style={-{Stealth[length=4mm,width=3mm]},draw=teal,line width=2.2pt}]
+% The supplied institutional template is preserved beneath the vector content.
+\node[anchor=north west] at (0,0) {\includegraphics[width=841mm,height=1189mm]{\repodir example_robots/SelfRisingRobot/poster/poster_template.png}};
+\fill[white] (127,12) rectangle (711,85);
+\node[font=\sz{61}\bfseries] at (420.5,36) {Embedded Systems Project Showcase};
+\node[font=\sz{43}\bfseries] at (420.5,68) {Integrated Computer Engineering (Batch 23)};
+\fill[white,rounded corners=3mm] (20,117) rectangle (821,192);
+\node[font=\sz{60}\bfseries,align=center, text width=2800pt] at (420.5,150) {Automated Sim-to-Real Deployment Framework for Reinforcement Learning Control on Resource Constrained Microcontrollers};
+% \node[font=\sz{27}] at (420.5,173) {SimToReal-A Python library that turns a trained robot controller into ESP32 code.};
+\node[font=\sz{26}] at (420.5,184) {Nidharshan V.\quad Yasantha Niroshana\quad Odil Janandith\quad Sulochana Sooriyaarachchi};
+\fill[white,rounded corners=3mm] (20,215) rectangle (821,1095);
+
+
+% Compact research-poster sections, following the supplied reference.
+% Coordinates are millimetres from the upper-left corner of an A0 page.
+\newcommand{\panel}[5]{
+ \draw[line,fill=white,line width=1pt,rounded corners=3mm] (#1,#2) rectangle (#3,#4);
+ \fill[navy,rounded corners=2mm] (#1,#2) rectangle (#3,{#2+19});
+ \fill[gold,rounded corners=.7mm] ({#1+2},{#2+4}) rectangle ({#1+3},{#2+15});
+ \node[anchor=west,text=white,font=\sz{31}\bfseries] at ({#1+5},{#2+9.5}) {#5};
+}
+\panel{37}{230}{281}{637}{1. PROBLEM SCENARIO}
+\node[anchor=west,font=\sz{26}\bfseries] at (44,262) {Learn in simulation. Run on a robot.};
+% Native vector icons: a training workstation and a constrained MCU.
+\draw[navy,fill=pale,line width=2pt,rounded corners=2mm] (55,283) rectangle (118,325);
+\draw[navy,line width=3pt] (86,325)--(86,334) (68,334)--(104,334);
+\foreach \x/\y in {66/294,66/312,84/290,84/303,84/316,105/298,105/310}{\fill[teal] (\x,\y) circle (2mm);}
+\foreach \y in {294,312}{\foreach \z in {290,303,316}{\draw[line] (66,\y)--(84,\z);}}
+\foreach \y in {290,303,316}{\foreach \z in {298,310}{\draw[line] (84,\y)--(105,\z);}}
+\draw[flow,line width=4pt] (131,307)--(173,307);
+\fill[navy,rounded corners=2mm] (200,285) rectangle (240,325);
+\foreach \i in {291,299,307,315}{\draw[navy,line width=3pt] (192,\i)--(200,\i) (240,\i)--(248,\i);}
+\foreach \i in {206,214,222,230}{\draw[navy,line width=3pt] (\i,277)--(\i,285) (\i,325)--(\i,333);}
+\node[text=white,font=\sz{27}\bfseries] at (220,306) {MCU};
+\node[font=\sz{25}\bfseries] at (87,349) {TRAINING COMPUTER};
+\node[font=\sz{25}\bfseries] at (220,349) {REAL ROBOT};
+\node[align=center,font=\sz{25},text=muted] at (87,371) {Train in simulation\\Save the learned policy};
+\node[align=center,font=\sz{25},text=muted] at (220,371) {ESP32 runs the controller\\Small onboard memory};
+\node[anchor=west,font=\sz{29}\bfseries] at (44,400) {Deployment barriers};
+\foreach \y/\n/\txt in {424/1/{Rewrite the learned controller as code},452/2/{Fit the code into a small controller},480/3/{Connect sensor readings to motors}} {
+ \fill[pale,rounded corners=2mm] (44,{\y-11}) rectangle (274,{\y+11});
+ \node[text=teal,font=\sz{28}\bfseries] at (54,\y) {\n};
+ \node[anchor=west,font=\sz{24}] at (65,\y) {\txt};
+}
+
+
+\node[anchor=west,font=\sz{29}\bfseries] at (44,510) {The missing link};
+\node[anchor=north west,text width=228mm,align=left,font=\sz{26},text=muted] at (44,525) {A robot learns in a computer simulation. Its \textbf{policy} chooses movements from sensor readings. Moving this learned controller to a real robot usually requires manual coding and hardware setup.};
+\fill[pale,rounded corners=2mm] (44,582) rectangle (274,628);
+\fill[gold] (44,585) rectangle (46,625);
+\node[anchor=west,font=\sz{27}\bfseries,text=teal] at (52,593) {Example task: self-rising};
+\node[anchor=north west,text width=211mm,align=left,font=\sz{25}] at (52,603) {A fallen robot must stand up using a tilt sensor and two servo motors.};
+
+
+
+\panel{294}{230}{804}{427}{2. FROM A VIRTUAL ROBOT TO A REAL ROBOT}
+\node[anchor=west,font=\sz{25},text=muted] at (303,263) {Training happens on the computer; the generated code runs on the robot.};
+\foreach \x/\name/\title/\body in {363/sim/SIMULATE/{Build a virtual robot\\MuJoCo},487/train/TRAIN/{Learn by trial and error\\PPO training},611/convert/CONVERT/{Generate robot code\\simtoreal library},735/run/RUN/{Control the real robot\\ESP32}} {
+ \node[box,minimum width=111mm,minimum height=50mm,font=\sz{27}] (\name) at (\x,299) {\textbf{\title}\\[4mm]\sz{23}\body};
+}
+\draw[flow] (sim)--(train);\draw[flow] (train)--(convert);\draw[flow] (convert)--(run);
+\node[box,minimum width=192mm,minimum height=23mm,font=\sz{23}] (settings) at (611,345) {Robot settings: sensors, motors and pins};
+\draw[flow] (settings.north)--(convert.south);
+\fill[pale,rounded corners=2mm] (303,366) rectangle (795,417);
+\node[font=\sz{25}\bfseries,text=teal] at (549,376) {GENERATED FILES $\rightarrow$ COPY TO THE ESP32};
+\node[font=\sz{24}] at (549,394) {Policy code + \texttt{main.py} + sensor and motor drivers};
+\node[font=\sz{24}\bfseries] at (549,409) {Read sensors\quad$\rightarrow$\quad Choose a movement\quad$\rightarrow$\quad Move motors};
+
+\panel{294}{440}{804}{637}{3. HOW THE LIBRARY WORKS}
+\fill[pale,rounded corners=2mm] (303,469) rectangle (795,496);
+\node[anchor=west,font=\sz{24}\bfseries] at (310,477) {Start conversion on your computer};
+\node[anchor=west,font=\sz{22}] at (310,490) {\texttt{simtoreal model.zip -c config.yaml}\quad (command-line entry point)};
+\node[box,fill=teal,text=white,minimum width=128mm,minimum height=79mm] (coord) at (380,553) {\textbf{Coordinate conversion}\\[4mm]\sz{22}\texttt{converter.py}\\[4mm]\sz{23}Check input/output counts\\Choose the export format};
+\draw[flow] (380,496)--(coord.north);
+\node[box,minimum width=136mm,minimum height=33mm] (reader) at (535,531) {\sz{24}\textbf{Read learned decisions}\\[3mm]\sz{22}\texttt{loaders.py}: actor weights};
+\node[box,minimum width=157mm,minimum height=33mm] (writer) at (709,531) {\sz{24}\textbf{Write policy code}\\[3mm]\sz{22}\texttt{exporter.py}: .h / .py / .mpy};
+\node[box,minimum width=136mm,minimum height=37mm] (yaml) at (535,575) {\sz{24}\textbf{Read robot settings}\\[2mm]\sz{22}Sensor inputs + motor outputs\\\texttt{config.yaml}: classes + pins};
+\node[box,minimum width=157mm,minimum height=33mm] (connector) at (709,575) {\sz{24}\textbf{Connect hardware + policy}\\[3mm]\sz{22}\texttt{interface.py} $\rightarrow$ \texttt{main.py}};
+\draw[flow] (444,531)--(reader.west);\draw[flow] (reader)--(writer);
+\draw[flow] (444,575)--(yaml.west);\draw[flow] (yaml)--(connector);
+\node[anchor=west,font=\sz{23},text=muted] at (310,603) {\texttt{main.py} imports driver classes, sets pins and joins the control loop.};
+\fill[navy,rounded corners=2mm] (303,613) rectangle (795,630);
+\node[text=white,font=\sz{23}] at (549,622) {\textbf{ON ESP32}\qquad Read sensors $\rightarrow$ Policy decides $\rightarrow$ Move motors $\rightarrow$ Repeat};
+
+\panel{37}{650}{281}{865}{4. CORE FEATURES}
+\node[anchor=west,font=\sz{25}\bfseries] at (45,686) {1. Keep the learned controller};
+\node[box,minimum width=91mm,minimum height=22mm,font=\sz{23}] (full) at (96,709) {Trained PPO model};
+\node[box,minimum width=91mm,minimum height=22mm,font=\sz{23}] (actor) at (221,709) {Decision network};
+\draw[flow] (full)--(actor);
+\node[font=\sz{22},text=muted] at (159,730) {Training-only components are left out.};
+\draw[line] (45,741)--(273,741);
+\node[anchor=west,font=\sz{25}\bfseries] at (45,756) {2. Choose a robot-ready format};
+\foreach \x/\ext/\label in {80/.h/{C header},159/.py/{Readable code},238/.mpy/{Compiled code}} {
+ \node[box,minimum width=66mm,minimum height=30mm] at (\x,783) {\textbf{\texttt{\ext}}\\[2mm]\sz{21}\label};
+}
+\node[font=\sz{21},text=muted] at (159,803) {Use .h in C firmware; .py / .mpy in MicroPython.};
+\draw[line] (45,811)--(273,811);
+\node[anchor=west,font=\sz{25}\bfseries] at (45,828) {3. Connect sensors and motors};
+\node[font=\sz{24},text=teal] at (159,844) {Robot settings $\rightarrow$ \texttt{main.py}};
+\node[font=\sz{22},text=muted] at (159,858) {Read sensors, run the policy, move motors};
+
+\panel{294}{650}{804}{865}{5. EXAMPLE: A ROBOT THAT STANDS UP}
+\node[font=\sz{26}\bfseries,text=teal] at (421,688) {COMPUTER SIMULATION};
+\node[font=\sz{26}\bfseries,text=teal] at (673,688) {PHYSICAL ROBOT};
+\node[anchor=north] at (421,702) {\includegraphics[height=133mm]{\paperdir robo.png}};
+\node[anchor=north] at (673,702) {\includegraphics[height=133mm,trim=165 155 310 230,clip]{\paperdir real_robo.png}};
+\draw[line] (549,702)--(549,835);
+\node[font=\sz{23},text=muted] at (421,844) {Learn how to stand up in MuJoCo};
+\node[font=\sz{23},text=muted] at (673,844) {ESP32 + tilt sensor + two servo motors};
+\node[font=\sz{24}\bfseries,text=teal] at (549,858) {5 sensor/state inputs\quad$\rightarrow$\quad Learned decisions\quad$\rightarrow$\quad 2 motor commands};
+
+\panel{37}{878}{620}{1085}{6. LITERATURE REVIEW}
+% Paper titles are linked to their primary source records. Research context is
+% distinguished from methods used in code; no third-party runtime is implied.
+\fill[teal] (45,905) rectangle (612,924);
+\node[anchor=west,text=white,font=\sz{25}\bfseries] at (51,915) {RESEARCH};
+\node[anchor=west,text=white,font=\sz{25}\bfseries] at (291,915) {WHAT IT IS ABOUT};
+\node[anchor=west,text=white,font=\sz{25}\bfseries] at (445,915) {HOW USED HERE};
+\fill[pale] (45,924) rectangle (612,962);
+\fill[pale] (45,1000) rectangle (612,1038);
+\node[anchor=west,align=left,font=\sz{22}] at (51,943) {\href{https://arxiv.org/abs/1707.06347}{\textbf{Proximal Policy Optimization Algorithms}}\\\sz{20}Schulman et al., 2017};
+\node[anchor=west,align=left,font=\sz{23}] at (291,943) {Learning useful movements\\through trial and error};
+\node[anchor=west,align=left,font=\sz{23}] at (445,943) {Trains the robot controller;\\we export its learned decisions};
+\node[anchor=west,align=left,font=\sz{22}] at (51,981) {\href{https://arxiv.org/abs/1703.06907}{\textbf{Domain Randomization for Transferring}}\\\href{https://arxiv.org/abs/1703.06907}{\textbf{Deep Neural Networks from Simulation}}\\\href{https://arxiv.org/abs/1703.06907}{\textbf{to the Real World}}\\\sz{20}Tobin et al., IROS 2017};
+\node[anchor=west,align=left,font=\sz{23}] at (291,981) {Varying simulated scenes to\\improve real-world transfer};
+\node[anchor=west,align=left,font=\sz{23}] at (445,981) {Vary robot physics and sensor\\noise during training};
+\node[anchor=west,align=left,font=\sz{22}] at (51,1019) {\href{https://arxiv.org/abs/2010.08678}{\textbf{TensorFlow Lite Micro: Embedded}}\\\href{https://arxiv.org/abs/2010.08678}{\textbf{Machine Learning on TinyML Systems}}\\\sz{20}David et al., MLSys 2021};
+\node[anchor=west,align=left,font=\sz{23}] at (291,1019) {Running learned models on\\limited-memory controllers};
+\node[anchor=west,align=left,font=\sz{23}] at (445,1019) {Design reference for the robot\textquotesingle s\\small memory budget};
+\node[anchor=west,align=left,font=\sz{22}] at (51,1057) {\href{https://jmlr.org/papers/v25/24-0248.html}{\textbf{RLtools: A Fast, Portable Deep}}\\\href{https://jmlr.org/papers/v25/24-0248.html}{\textbf{Reinforcement Learning Library}}\\\href{https://jmlr.org/papers/v25/24-0248.html}{\textbf{for Continuous Control}}\\\sz{20}Eschmann, Albani \& Loianno, JMLR 2024};
+\node[anchor=west,align=left,font=\sz{23}] at (291,1057) {Fast C++ learning and decisions\\across different devices};
+\node[anchor=west,align=left,font=\sz{23}] at (445,1057) {Reference for running learned\\controllers on small devices};
+\foreach \y in {962,1000,1038,1076}{\draw[line] (45,\y)--(612,\y);}
+\draw[line] (283,905)--(283,1076) (437,905)--(437,1076);
+
+\panel{633}{878}{804}{1018}{7. RESULTS}
+% Recorded benchmarks: tests/README.md, Results so far (27 Sep 2026).
+% These measurements predate retraining; simulation success is not a physical
+% robot success rate. The generated-loop result is device test D4.
+\fill[teal] (642,905) rectangle (795,919);
+\node[anchor=west,text=white,font=\sz{22}\bfseries] at (646,912) {CHECK};
+\node[anchor=west,text=white,font=\sz{22}\bfseries] at (745,912) {RESULT};
+\fill[pale] (642,919) rectangle (795,931);
+\fill[pale] (642,943) rectangle (795,955);
+\fill[pale] (642,967) rectangle (795,979);
+\node[anchor=west,font=\sz{21}] at (646,925) {Export: maximum error};
+\node[anchor=west,font=\sz{21}\bfseries,text=teal] at (745,925) {$<3\times10^{-6}$};
+\node[anchor=west,font=\sz{21}] at (646,937) {Simulated get-up success};
+\node[anchor=west,font=\sz{21}\bfseries,text=teal] at (745,937) {97.2\%};
+\node[anchor=west,font=\sz{21}] at (646,949) {Generated ESP32 loop};
+\node[anchor=west,font=\sz{21}\bfseries,text=teal] at (745,949) {100/100 cycles};
+\node[anchor=west,font=\sz{21}] at (646,961) {MicroPython decision time};
+\node[anchor=west,font=\sz{21}\bfseries,text=teal] at (745,961) {155 ms};
+\node[anchor=west,font=\sz{21}] at (646,973) {MicroPython policy RAM};
+\node[anchor=west,font=\sz{21}\bfseries,text=teal] at (745,973) {119.6 kB};
+\foreach \y in {931,943,955,967,979}{\draw[line] (642,\y)--(795,\y);}
+\draw[line] (741,905)--(741,979);
+\node[anchor=west,font=\sz{22}\bfseries,text=teal] at (642,989) {CONCLUSION};
+\node[anchor=north west,text width=153mm,align=left,font=\sz{21}] at (642,996) {\raggedright Accurate conversion; faster inference is needed for 50 Hz control.};
+\fill[pale,rounded corners=3mm] (633,1026) rectangle (804,1085);
+\node[anchor=west,font=\sz{23}\bfseries,text=teal] at (642,1037) {EXPLORE THE PROJECT};
+\node[anchor=north west,align=left,font=\sz{19}] at (642,1046) {\href{https://github.com/NidharVignesh/sim2real-framework}{github.com/NidharVignesh/}\\\href{https://github.com/NidharVignesh/sim2real-framework}{sim2real-framework}};
+\node[anchor=north west] at (749,1033) {\href{https://github.com/NidharVignesh/sim2real-framework}{\includegraphics[width=48mm]{\paperdir qr.png}}};
+\node[anchor=west,align=left,font=\sz{20},text=muted] at (642,1074) {Scan for code + examples};
+
+% Institutional footer, drawn as vector text over the supplied template.
+\fill[navy] (100,1100) rectangle (741,1183);
+\node[text=white,font=\sz{30}\bfseries] at (420.5,1125) {Organized by};
+\node[text=white,font=\sz{43}\bfseries] at (420.5,1149) {Department of Computer Science \& Engineering};
+\node[text=white,font=\sz{43}\bfseries] at (420.5,1173) {University of Moratuwa};
+\end{scope}
+\end{tikzpicture}
+\end{document}

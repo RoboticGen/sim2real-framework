@@ -8,6 +8,8 @@ setup(
         "numpy",
         "torch",
         "stable-baselines3",
+        "pyyaml",
+        "mpy-cross",
     ],
     entry_points={
         "console_scripts": [

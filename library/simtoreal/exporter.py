@@ -65,18 +65,18 @@ def generate_header(network: dict, output_path: str, header_guard: str = "POLICY
 
         lines.append(f"    // Layer {i}  ({in_size} → {out_size})")
         lines.append(f"    for (int o = 0; o < {out_size}; o++) {{")
-        lines.append(f"        float sum = policy_b{i}[o];")
+        lines.append(f"        float s = policy_b{i}[o];")
         lines.append(f"        for (int j = 0; j < {in_size}; j++) {{")
-        lines.append(f"            sum += policy_w{i}[o * {in_size} + j] * curr[j];")
+        lines.append(f"            s += policy_w{i}[o * {in_size} + j] * curr[j];")
         lines.append(f"        }}")
         if is_last:
-            lines.append(f"        next[o] = sum;  // linear output")
+            lines.append(f"        next[o] = s;  // linear output")
         else:
-            lines.append(f"        next[o] = act(sum);")
+            lines.append(f"        next[o] = act(s);")
         lines.append("    }")
         lines.append("")
         lines.append("    // swap buffers")
-        lines.append("    float* tmp = curr; curr = next; next = tmp;")
+        lines.append("    { float* tmp = curr; curr = next; next = tmp; }")
         lines.append("")
 
     lines.append(f"    for (int i = 0; i < {output_size}; i++) output[i] = curr[i];")
@@ -86,3 +86,107 @@ def generate_header(network: dict, output_path: str, header_guard: str = "POLICY
 
     Path(output_path).write_text("\n".join(lines))
     print(f"Generated: {output_path}")
+
+def generate_python_network(network: dict, output_path: str):
+    layers = network["layers"]
+    input_size = network["input_size"]
+    output_size = network["output_size"]
+    activation = network.get("activation", "tanh")
+
+    lines = []
+    lines.append("#Auto-generated SimToReal policy network in Python")
+    lines.append(f"POLICY_INPUT_SIZE  = {input_size}")
+    lines.append(f"POLICY_OUTPUT_SIZE = {output_size}")
+    lines.append("")
+
+    for i, layer in enumerate(layers):
+        w = layer["weight"]
+        b = layer["bias"]
+
+        w_rows=[]
+        for row in w:
+            w_rows.append("[" + ", ".join(f"{x:.8f}" for x in row) + "]")
+        lines.append(f"policy_w{i}=[" + ",\n    ".join(w_rows) + "]")
+        lines.append("")
+
+        if b is not None:
+            b_str=", ".join(f"{x:.8f}" for x in b)
+            lines.append(f"policy_b{i}=[{b_str}]")
+        else:
+            lines.append(f"policy_b{i}=[0.0] * {w.shape[0]}  # No bias for this layer")
+        lines.append("")
+
+    lines.append("import math")
+    if activation == "tanh":
+        lines.append("def act(x) :")
+        lines.append("    return math.tanh(x)")
+    else:
+        lines.append("def act(x) :")
+        lines.append("    return x if x > 0.0 else 0.0")
+    lines.append("")
+
+    lines.append("def policy_forward(obs):")
+    lines.append("    x=list(obs)")
+    lines.append("")
+
+    for i, layer in enumerate(layers):
+        w = layer["weight"]
+        out_size = w.shape[0]
+        in_size  = w.shape[1]
+        is_last  = (i == len(layers) - 1)
+
+        lines.append(f"    # Layer {i} : ({in_size} -> {out_size})")
+        lines.append(f"    next=[0.0]*{out_size}")
+        lines.append(f"    for o in range({out_size}):")
+        lines.append(f"        s=policy_b{i}[o]")
+        lines.append(f"        for j in range({in_size}):")
+        lines.append(f"            s += policy_w{i}[o][j] * x[j]")
+        if is_last:
+            lines.append(f"        next[o] = s  # linear output")
+        else:
+            lines.append(f"        next[o] = act(s)")
+        lines.append("    x=next")
+        lines.append("")
+        
+    lines.append("    return x")
+    lines.append("")
+
+    Path(output_path).write_text("\n".join(lines))
+    print(f"Generated: {output_path}")
+
+def generate_mpy_network(network: dict, output_path: str, micropython_version: str = None):
+    """Generate the MicroPython module and precompile it to .mpy bytecode with mpy-cross.
+
+    The board then only loads bytecode; compiling a large .py on the microcontroller itself
+    can run out of RAM. micropython_version (e.g. "1.22") targets older firmware; by default the
+    newest version supported by the installed mpy-cross is used.
+    """
+    import contextlib
+    import io
+    import subprocess
+    import tempfile
+
+    try:
+        import mpy_cross
+    except ImportError as e:
+        raise RuntimeError("Building .mpy files needs mpy-cross: pip install mpy-cross") from e
+    if micropython_version:
+        mpy_cross.set_version(micropython_version, None)
+
+    output_path = Path(output_path)
+    with tempfile.TemporaryDirectory() as tmp:
+        py_path = Path(tmp) / (output_path.stem + ".py")
+        with contextlib.redirect_stdout(io.StringIO()):  # the temporary .py is not an output
+            generate_python_network(network, str(py_path))
+        proc = mpy_cross.run("-s", py_path.name, "-o", str(output_path), str(py_path),
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _, err = proc.communicate()
+        if proc.returncode != 0:
+            raise RuntimeError(f"mpy-cross failed:\n{err.decode(errors='replace')}")
+    version = mpy_cross.run("--version", stdout=subprocess.PIPE).communicate()[0].decode().strip()
+    print(f"Generated: {output_path}  ({version})")
+
+
+if __name__ == "__main__":
+    import argparse
+    from .loaders import load_sb3_policy, load_torch_policy
